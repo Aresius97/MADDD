@@ -1,3 +1,32 @@
+# 1. Open terminal, create new project
+flutter create my_flutter_app
+cd my_flutter_app
+
+# 2. Open VS Code
+code .
+
+# 3. Replace content of lib/main.dart with my code
+
+# 4. For Experiment 6 (JSON), create folder and file:
+mkdir assets
+echo '{"name":"John","age":30}' > assets/data.json
+
+# 5. Add to pubspec.yaml (remove comment # from these lines):
+assets:
+  - assets/data.json
+
+# 6. Run in terminal:
+flutter pub get
+flutter run
+
+
+
+
+
+
+
+
+
 import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
