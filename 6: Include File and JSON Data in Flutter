@@ -1,0 +1,193 @@
+# 1. Open terminal, create new project
+flutter create my_flutter_app
+cd my_flutter_app
+
+# 2. Open VS Code
+code .
+
+# 3. Replace content of lib/main.dart with my code
+
+# 4. For Experiment 6 (JSON), create folder and file:
+mkdir assets
+echo '{"name":"John","age":30}' > assets/data.json
+
+# 5. Add to pubspec.yaml (remove comment # from these lines):
+assets:
+  - assets/data.json
+
+# 6. Run in terminal:
+flutter pub get
+flutter run
+
+
+
+
+
+
+
+
+assets/data.json
+
+json
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "John Doe",
+      "email": "john@example.com",
+      "age": 28
+    },
+    {
+      "id": 2,
+      "name": "Jane Smith",
+      "email": "jane@example.com",
+      "age": 32
+    }
+  ],
+  "company": "Flutter Demo Inc",
+  "version": "1.0"
+}
+lib/main.dart
+
+dart
+import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'dart:io';
+import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
+
+void main() => runApp(const MyApp());
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'JSON & File Demo',
+      home: const JsonFileDemo(),
+    );
+  }
+}
+
+class JsonFileDemo extends StatefulWidget {
+  const JsonFileDemo({super.key});
+
+  @override
+  State<JsonFileDemo> createState() => _JsonFileDemoState();
+}
+
+class _JsonFileDemoState extends State<JsonFileDemo> {
+  String _displayData = 'Press button to load data';
+  Map<String, dynamic>? _jsonData;
+
+  Future<void> _loadJsonFromAssets() async {
+    try {
+      String jsonString = await rootBundle.loadString('assets/data.json');
+      _jsonData = json.decode(jsonString);
+      setState(() {
+        _displayData = 'JSON loaded from assets:\n${_jsonData.toString()}';
+      });
+    } catch (e) {
+      setState(() {
+        _displayData = 'Error loading JSON: $e';
+      });
+    }
+  }
+
+  Future<void> _writeToFile() async {
+    try {
+      Directory directory = await getApplicationDocumentsDirectory();
+      String path = '${directory.path}/user_data.txt';
+      File file = File(path);
+      
+      String content = 'User Data:\nName: Test User\nTime: ${DateTime.now()}';
+      await file.writeAsString(content);
+      
+      setState(() {
+        _displayData = 'File written successfully to:\n$path\nContent:\n$content';
+      });
+    } catch (e) {
+      setState(() {
+        _displayData = 'Error writing file: $e';
+      });
+    }
+  }
+
+  Future<void> _readFromFile() async {
+    try {
+      Directory directory = await getApplicationDocumentsDirectory();
+      String path = '${directory.path}/user_data.txt';
+      File file = File(path);
+      
+      if (await file.exists()) {
+        String content = await file.readAsString();
+        setState(() {
+          _displayData = 'File content:\n$content';
+        });
+      } else {
+        setState(() {
+          _displayData = 'File does not exist. Write to file first.';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _displayData = 'Error reading file: $e';
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('JSON & File Handling'),
+        backgroundColor: Colors.purple,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: _loadJsonFromAssets,
+                  icon: const Icon(Icons.folder_open),
+                  label: const Text('Load JSON'),
+                ),
+                ElevatedButton.icon(
+                  onPressed: _writeToFile,
+                  icon: const Icon(Icons.save),
+                  label: const Text('Write File'),
+                ),
+                ElevatedButton.icon(
+                  onPressed: _readFromFile,
+                  icon: const Icon(Icons.folder),
+                  label: const Text('Read File'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Expanded(
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: SingleChildScrollView(
+                  child: Text(
+                    _displayData,
+                    style: const TextStyle(fontFamily: 'monospace'),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
