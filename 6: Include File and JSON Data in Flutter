@@ -11,9 +11,13 @@ code .
 mkdir assets
 echo '{"name":"John","age":30}' > assets/data.json
 
-# 5. Add to pubspec.yaml (remove comment # from these lines):
-assets:
-  - assets/data.json
+# 5. # Open pubspec.yaml (already exists) and add:
+flutter:
+  uses-material-design: true
+  assets:           # ← Add this line
+    - assets/data.json  # ← Add this line
+And for Experiment 6, also run:
+flutter pub add path_provider  # Adds the file handling package
 
 # 6. Run in terminal:
 flutter pub get
